@@ -448,10 +448,10 @@ void gravarDecodificado(char *nomeArquivo,Raiz *raiz,Topo *topo){
 	string linhaRaiz = raizToString(raiz,nomeArquivo);
 	linhaRaiz= linhaRaiz + "\n";
 	cout <<linhaRaiz;
-	ofstream file(nomeArquivo);
-	
-
-	cout<<"Aperte qualquer tecla para continuar e gravar no arquivo: "<<endl;
+	//ofstream file(nomeArquivo);
+	ofstream file;
+    file.open(nomeArquivo);
+    cout<<"Aperte qualquer tecla para continuar e gravar no arquivo: "<<endl;
     getchar();
 	file << linhaRaiz;
 	file.close();
@@ -531,27 +531,32 @@ bool inserir(Raiz *raiz,int novoValor,Topo *topo,char *nomeArquivo){
         Folha *atual = raiz->getInicio();
         Folha *anterior = NULL;
         while(atual->getValEsq()<novoValor){//Enquanto o novo valor for maio que o primeiro valor da folha
-            if(atual->getProx() == NULL){//Se o proximo nodo for NULL, chegou ao ultimo nodo
-                if((novoValor > atual->getValDir())&&(atual->getValDir()!=NULO)){
-                    atual->setValExtra(novoValor);
-                    //divideFolha(atual);
-                    raiz->atualizaQntElem();
-                }else if((novoValor < atual->getValDir())&&(atual->getValDir()!=NULO)){
-                    atual->setValExtra(atual->getValDir());
-                    atual->setValDir(novoValor);
-                    //divideFolha(atual);
-                    raiz->atualizaQntElem();
-                }else if(atual->getValDir()==NULO){
-                    atual->setValDir(novoValor);
-                    raiz->atualizaQntElem();
-                }else{
-                    return false;
+            if (novoValor == atual->getValDir() || novoValor == atual->getValEsq() || novoValor == atual->getValExtra()) {
+                cout << "valor " << novoValor << " já existente, não foi inserido." << endl;
+                return false;
+            }else{
+                if(atual->getProx() == NULL){//Se o proximo nodo for NULL, chegou ao ultimo nodo
+                    if((novoValor > atual->getValDir())&&(atual->getValDir()!=NULO)){
+                        atual->setValExtra(novoValor);
+                        //divideFolha(atual);
+                        raiz->atualizaQntElem();
+                    }else if((novoValor < atual->getValDir())&&(atual->getValDir()!=NULO)){
+                        atual->setValExtra(atual->getValDir());
+                        atual->setValDir(novoValor);
+                        //divideFolha(atual);
+                        raiz->atualizaQntElem();
+                    }else if(atual->getValDir()==NULO){
+                        atual->setValDir(novoValor);
+                        raiz->atualizaQntElem();
+                    }else{
+                        return false;
+                    }
+                    end = true;
+                    break;
                 }
-                end = true;
-                break;
+                anterior = atual;
+                atual = atual->getProx();
             }
-            anterior = atual;
-            atual = atual->getProx();
         }
         if(!end){//Não chegou ao fim da lista
             if(anterior == NULL){//Não entrou uma vez no laço
