@@ -412,6 +412,8 @@ bool lerDecodificado(char *nomeArquivo,Raiz *raiz, Topo *topo){//Lê o arquivo d
                 //O segredo é que aqui, cada valor1 do nodo(exceto do primeiro nodo) vai existir em algum ValEsq das folhas
                 //Então é só andar na raiz e descobrir onde está o valor que está no nodo e apontar
                 //A raiz já se encontra em memória em pleno funcionamento
+                cout << "else do aponteiramento das folhas" << endl;
+                
             }
             memcpy(novoInicio,&nodosAtuais.at(nodosAtuais.size()-1),sizeof(Nodo));
             topo->setInicio(novoInicio);//Seta o novo início
@@ -448,10 +450,9 @@ void gravarDecodificado(char *nomeArquivo,Raiz *raiz,Topo *topo){
 	cout <<linhaRaiz;
 	ofstream file(nomeArquivo);
 	
-	int op;
+
 	cout<<"Aperte qualquer tecla para continuar e gravar no arquivo: "<<endl;
-	cin >> op;
-	
+    getchar();
 	file << linhaRaiz;
 	file.close();
     
@@ -742,7 +743,7 @@ int main(int argc, char **argv){
                     
 				}else if(strcmp(argv[2],"-p")==0){
 					cout<<"Entrando na opcao de imprimir toda a arvore"<<endl<<endl;
-                    exec("open graph.dot");
+                  //  exec("open graph.dot");
 				}
 				gravarDecodificado(argv[1],&raiz,&topo);
 				if(raiz.getInicio()!= NULL)
