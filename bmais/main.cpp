@@ -209,6 +209,31 @@ string intToString(int numero){
 	string str = ss.str();
 	return str;
 }
+
+vector<string> explodeStr(const string& str, const char& ch) {
+    string next;
+    vector<string> result;
+    
+    // For each character in the string
+    for (string::const_iterator it = str.begin(); it != str.end(); it++) {
+        // If we've hit the terminal character
+        if (*it == ch) {
+            // If we have some characters accumulated
+            if (!next.empty()) {
+                // Add them to the result vector
+                result.push_back(next);
+                next.clear();
+            }
+        } else {
+            // Accumulate the next character into the sequence
+            next += *it;
+        }
+    }
+    if (!next.empty())
+        result.push_back(next);
+    return result;
+}
+
 //Decodifica a estrutura da folha a partir de uma string e atualiza os ponteiros das folhas e da raiz
 void decodificaFolha(string structFolha,Raiz *raiz){
 	Folha *novaFolha = (Folha*)malloc(sizeof(Folha));
@@ -350,6 +375,104 @@ void decodificaRaiz(string line,Raiz *raiz,bool controle){//Decodifica a primeir
     
 }
 
+struct Folha *atribuiFolhas(struct Nodo *n,struct Nodo *p, struct Folha *f){
+    struct Folha *ultimaFolha = f;
+    cout << "passando pelo nodo" << endl;
+    if (n->getValor1()) {
+        cout << "v1: " << n->getValor1();
+    }
+    if (n->getValor2()) {
+        cout << " v2: " << n->getValor2();
+    }
+    if (n->getValor3()) {
+        cout << " v3: " << n->getValor3() << endl;
+    }
+    
+    if(!n->getNodoEsquerda()&&!n->getNodoMeio()&&!n->getNodoDireita()){
+        cout << "quase folha: " << endl;
+        if ( f->getValEsq() <= n->getValor1() && f->getValDir() <= n->getValor1() && n->getValor1()!=NULO) {
+            if (!n->getFolhaEsquerda()) {
+                n->setFolhaEsquerda(f);
+                f = f->getProx();
+                ultimaFolha = f;
+                
+            }else if (n->getFolhaEsquerda() && !n->getFolhaMeio()){
+                n->setFolhaMeio(f);
+                f = f->getProx();
+                ultimaFolha = f;
+            }else if (n->getFolhaEsquerda() && n->getFolhaMeio() && !n->getFolhaDireita()){
+                n->setFolhaDireita(f);
+                f = f->getProx();
+                ultimaFolha = f;
+            }
+        }
+        if ( (f->getValEsq() >= n->getValor1() && f->getValDir() >= n->getValor1() && n->getValor1()!=NULO) || (f->getValEsq() >= n->getValor2() && f->getValDir() >= n->getValor2()) || f->getValEsq()==n->getValor1()) {
+            if (!n->getFolhaEsquerda()) {
+                n->setFolhaEsquerda(f);
+                f = f->getProx();
+                ultimaFolha = f;
+            }else if (n->getFolhaEsquerda() && !n->getFolhaMeio()){
+                n->setFolhaMeio(f);
+                f = f->getProx();
+                ultimaFolha = f;
+            }else if (n->getFolhaEsquerda() && n->getFolhaMeio() && !n->getFolhaDireita()){
+                n->setFolhaDireita(f);
+                f = f->getProx();
+                ultimaFolha = f;
+            }
+        }
+        if ( f->getValEsq() == n-> getValor1() && f->getValDir() == n->getValor2() && n->getValor1()!=NULO && n->getValor2()!=NULO) {
+            n->setFolhaMeio(f);
+            f = f->getProx();
+            ultimaFolha = f;
+            
+        }
+        
+        return ultimaFolha;
+    }else{
+        if (n->getNodoEsquerda()) {
+            ultimaFolha = atribuiFolhas(n->getNodoEsquerda(),n, ultimaFolha);
+        }
+        if (n->getNodoMeio()) {
+            ultimaFolha = atribuiFolhas(n->getNodoMeio(),n, ultimaFolha);
+            
+        }
+        if (n->getNodoDireita()) {
+            ultimaFolha = atribuiFolhas(n->getNodoDireita(),n, ultimaFolha);
+        }
+        if (p) { //estamos na raiz?
+            if (f->getValEsq() >= p->getValor1() || f->getValEsq() >= p->getValor2() || f->getValDir() >= p->getValor1() || f->getValDir() >= p->getValor2()) {
+                return ultimaFolha;
+            }
+/*            if (n->getNodoMeio()) {
+                salto += atribuiFolhas(n->getNodoMeio(),n, f);
+                while (salto!=0) {
+                    f=f->getProx();
+                    salto--;
+                }
+            }*/
+            if (f->getValEsq() >= p->getValor1() || f->getValEsq() >= p->getValor2() || f->getValDir() >= p->getValor1() || f->getValDir() >= p->getValor2()) {
+                return ultimaFolha;
+            }
+            /*if (n->getNodoDireita()) {
+                salto += atribuiFolhas(n->getNodoDireita(),n, f);
+                while (salto!=0) {
+                    f=f->getProx();
+                    salto--;
+                }
+            }*/
+            if (f->getValEsq() >= p->getValor1() || f->getValEsq() >= p->getValor2() || f->getValDir() >= p->getValor1() || f->getValDir() >= p->getValor2()) {
+                return ultimaFolha;
+            }
+        }else{
+            
+            return ultimaFolha;
+        }
+    }
+    
+    return ultimaFolha;
+}
+
 bool lerDecodificado(char *nomeArquivo,Raiz *raiz, Topo *topo){//Lê o arquivo decodificado
     
     ifstream fileReader(nomeArquivo);//Abre o arquivo recebido por argumento
@@ -419,6 +542,7 @@ bool lerDecodificado(char *nomeArquivo,Raiz *raiz, Topo *topo){//Lê o arquivo d
             topo->setInicio(novoInicio);//Seta o novo início
         }
     }
+    atribuiFolhas(topo->getInicio(),NULL, raiz->getInicio());
     fileReader.close();
     return true;
 }
