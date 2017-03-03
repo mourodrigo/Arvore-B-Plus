@@ -1,4 +1,4 @@
-#Arvore BP
+#Arvore B+
 
 Implementação de uma árvore B+ com requisitos funcionais:
 
